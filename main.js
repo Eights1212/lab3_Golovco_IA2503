@@ -14,13 +14,13 @@
 /** @type {Transaction[]} */
 const transactions = [
     {
-        transaction_id: 31, // id
-        transaction_date: "2021-06-10", // дата
-        transaction_amount: 300, // сумма
-        transaction_type: "credit", // тип
-        transaction_description: "Salary", // описание
-        merchant_name: "OfficeCorp", // магазин
-        card_type: "debit" // карта
+        transaction_id: 31,
+        transaction_date: "2021-06-10",
+        transaction_amount: 300,
+        transaction_type: "credit",
+        transaction_description: "Salary",
+        merchant_name: "OfficeCorp",
+        card_type: "debit"
     },
     {
         transaction_id: 32,
@@ -46,41 +46,39 @@ const transactions = [
  * Получить уникальные типы
  */
 function getUniqueTypes(arr) {
-    var result = []; // массив для результата
+    let result = [];
 
-    for (var i = 0; i < arr.length; i++) { // проходим по массиву
-
-        if (result.indexOf(arr[i].transaction_type) === -1) { // если такого типа ещё нет
-            result.push(arr[i].transaction_type); // добавляем
+    for (let i = 0; i < arr.length; i++) {
+        if (result.indexOf(arr[i].transaction_type) === -1) {
+            result.push(arr[i].transaction_type);
         }
     }
 
-    return result; // возвращаем результат
+    return result;
 }
 
 /**
  * Общая сумма
  */
 function getTotalAmount(arr) {
-    var sum = 0; // переменная суммы
+    let sum = 0;
 
-    for (var i = 0; i < arr.length; i++) { // цикл по массиву
-        sum += arr[i].transaction_amount; // прибавляем сумму
+    for (let i = 0; i < arr.length; i++) {
+        sum += arr[i].transaction_amount;
     }
 
-    return sum; // возвращаем итог
+    return sum;
 }
 
 /**
  * Фильтр по типу
  */
 function getByType(arr, type) {
-    var result = []; // новый массив
+    let result = [];
 
-    for (var i = 0; i < arr.length; i++) {
-
-        if (arr[i].transaction_type === type) { // если тип совпадает
-            result.push(arr[i]); // добавляем
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].transaction_type === type) {
+            result.push(arr[i]);
         }
     }
 
@@ -91,14 +89,14 @@ function getByType(arr, type) {
  * Фильтр по датам
  */
 function getByDateRange(arr, start, end) {
-    var result = [];
+    let result = [];
 
-    var s = new Date(start); // начальная дата
-    var e = new Date(end);   // конечная дата
+    let s = new Date(start);
+    let e = new Date(end);
 
-    for (var i = 0; i < arr.length; i++) {
-        var d = new Date(arr[i].transaction_date); // дата транзакции
-        if (d >= s && d <= e) { // проверка диапазона
+    for (let i = 0; i < arr.length; i++) {
+        let d = new Date(arr[i].transaction_date);
+        if (d >= s && d <= e) {
             result.push(arr[i]);
         }
     }
@@ -109,11 +107,10 @@ function getByDateRange(arr, start, end) {
  * Поиск по магазину
  */
 function getByMerchant(arr, name) {
-    var result = [];
+    let result = [];
 
-    for (var i = 0; i < arr.length; i++) {
-
-        if (arr[i].merchant_name === name) { // сравниваем название
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].merchant_name === name) {
             result.push(arr[i]);
         }
     }
@@ -125,20 +122,19 @@ function getByMerchant(arr, name) {
  * Среднее значение
  */
 function getAverage(arr) {
-    if (arr.length === 0) return 0; // если пусто
+    if (arr.length === 0) return 0;
 
-    return getTotalAmount(arr) / arr.length; // формула среднего
+    return getTotalAmount(arr) / arr.length;
 }
 
 /**
  * Фильтр по сумме
  */
 function getByAmount(arr, min, max) {
-    var result = [];
+    let result = [];
 
-    for (var i = 0; i < arr.length; i++) {
-
-        if (arr[i].transaction_amount >= min && arr[i].transaction_amount <= max) { // диапазон
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].transaction_amount >= min && arr[i].transaction_amount <= max) {
             result.push(arr[i]);
         }
     }
@@ -150,11 +146,10 @@ function getByAmount(arr, min, max) {
  * Сумма debit
  */
 function getDebitSum(arr) {
-    var sum = 0;
+    let sum = 0;
 
-    for (var i = 0; i < arr.length; i++) {
-
-        if (arr[i].transaction_type === "debit") { // только debit
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].transaction_type === "debit") {
             sum += arr[i].transaction_amount;
         }
     }
@@ -166,19 +161,19 @@ function getDebitSum(arr) {
  * Месяц максимум
  */
 function getMaxMonth(arr) {
-    var months = {}; // объект счётчика
+    let months = {};
 
-    for (var i = 0; i < arr.length; i++) {
-        var m = new Date(arr[i].transaction_date).getMonth() + 1; // получаем месяц
-        if (!months[m]) months[m] = 0; // если нет — создаём
-        months[m]++; // увеличиваем
+    for (let i = 0; i < arr.length; i++) {
+        let m = new Date(arr[i].transaction_date).getMonth() + 1;
+        if (!months[m]) months[m] = 0;
+        months[m]++;
     }
 
-    var max = 0;
-    var res = null;
+    let max = 0;
+    let res = null;
 
-    for (var key in months) {
-        if (months[key] > max) { // ищем максимум
+    for (let key in months) {
+        if (months[key] > max) {
             max = months[key];
             res = key;
         }
@@ -190,21 +185,20 @@ function getMaxMonth(arr) {
  * Месяц максимум debit
  */
 function getMaxDebitMonth(arr) {
-    var months = {};
+    let months = {};
 
-    for (var i = 0; i < arr.length; i++) {
-        if (arr[i].transaction_type === "debit") { // только debit
-            var m = new Date(arr[i].transaction_date).getMonth() + 1;
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].transaction_type === "debit") {
+            let m = new Date(arr[i].transaction_date).getMonth() + 1;
             if (!months[m]) months[m] = 0;
             months[m]++;
         }
     }
 
-    var max = 0;
-    var res = null;
+    let max = 0;
+    let res = null;
 
-    for (var key in months) {
-
+    for (let key in months) {
         if (months[key] > max) {
             max = months[key];
             res = key;
@@ -218,12 +212,11 @@ function getMaxDebitMonth(arr) {
  * Сравнение типов
  */
 function compareTypes(arr) {
-    var d = 0, c = 0; // счётчики
+    let d = 0, c = 0;
 
-    for (var i = 0; i < arr.length; i++) {
-
-        if (arr[i].transaction_type === "debit") d++; // считаем debit
-        else if (arr[i].transaction_type === "credit") c++; // считаем credit
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].transaction_type === "debit") d++;
+        else if (arr[i].transaction_type === "credit") c++;
     }
 
     if (d > c) return "debit";
@@ -236,12 +229,11 @@ function compareTypes(arr) {
  * До даты
  */
 function beforeDate(arr, date) {
-    var result = [];
-    var d = new Date(date); // целевая дата
+    let result = [];
+    let d = new Date(date);
 
-    for (var i = 0; i < arr.length; i++) {
-
-        if (new Date(arr[i].transaction_date) < d) { // если раньше
+    for (let i = 0; i < arr.length; i++) {
+        if (new Date(arr[i].transaction_date) < d) {
             result.push(arr[i]);
         }
     }
@@ -253,11 +245,9 @@ function beforeDate(arr, date) {
  * Поиск по id
  */
 function getById(arr, id) {
-
-    for (var i = 0; i < arr.length; i++) {
-
-        if (arr[i].transaction_id === id) { // сравнение id
-            return arr[i]; // возвращаем объект
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].transaction_id === id) {
+            return arr[i];
         }
     }
 }
@@ -266,10 +256,10 @@ function getById(arr, id) {
  * Описания
  */
 function getDescriptions(arr) {
-    var result = [];
+    let result = [];
 
-    for (var i = 0; i < arr.length; i++) {
-        result.push(arr[i].transaction_description); // добавляем описание
+    for (let i = 0; i < arr.length; i++) {
+        result.push(arr[i].transaction_description);
     }
 
     return result;
@@ -278,17 +268,17 @@ function getDescriptions(arr) {
 
 // вывод
 
-console.log(getUniqueTypes(transactions)); // уникальные типы
-console.log(getTotalAmount(transactions)); // сумма
-console.log(getByType(transactions, "debit")); // фильтр
-console.log(getByDateRange(transactions, "2021-06-01", "2021-06-20")); // даты
-console.log(getByMerchant(transactions, "ShoeStore")); // магазин
-console.log(getAverage(transactions)); // среднее
-console.log(getByAmount(transactions, 50, 200)); // диапазон
-console.log(getDebitSum(transactions)); // сумма debit
-console.log(getMaxMonth(transactions)); // месяц
-console.log(getMaxDebitMonth(transactions)); // месяц debit
-console.log(compareTypes(transactions)); // сравнение
-console.log(beforeDate(transactions, "2021-06-12")); // до даты
-console.log(getById(transactions, 31)); // поиск
-console.log(getDescriptions(transactions)); // описания
+console.log(getUniqueTypes(transactions));
+console.log(getTotalAmount(transactions));
+console.log(getByType(transactions, "debit"));
+console.log(getByDateRange(transactions, "2021-06-01", "2021-06-20"));
+console.log(getByMerchant(transactions, "ShoeStore"));
+console.log(getAverage(transactions));
+console.log(getByAmount(transactions, 50, 200));
+console.log(getDebitSum(transactions));
+console.log(getMaxMonth(transactions));
+console.log(getMaxDebitMonth(transactions));
+console.log(compareTypes(transactions));
+console.log(beforeDate(transactions, "2021-06-12"));
+console.log(getById(transactions, 31));
+console.log(getDescriptions(transactions));
