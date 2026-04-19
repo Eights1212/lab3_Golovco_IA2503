@@ -41,230 +41,261 @@ const transactions = [
         card_type: "debit"
     }
 ];
+/**
+ * Возвращает массив уникальных типов транзакций.
+ * Для удаления повторяющихся значений используется Set.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @returns {Array<string>} Массив уникальных типов транзакций.
+ */
+function getUniqueTransactionTypes(transactions) {
+    const types = transactions.map(function (transaction) {
+        return transaction.transaction_type;
+    });
+
+    return [...new Set(types)];
+}
 
 /**
- * Получить уникальные типы
+ * Вычисляет общую сумму всех транзакций.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @returns {number} Сумма всех транзакций.
  */
-function getUniqueTypes(arr) {
-    let result = [];
+function calculateTotalAmount(transactions) {
+    return transactions.reduce(function (sum, transaction) {
+        return sum + transaction.transaction_amount;
+    }, 0);
+}
 
-    for (let i = 0; i < arr.length; i++) {
-        if (result.indexOf(arr[i].transaction_type) === -1) {
-            result.push(arr[i].transaction_type);
+/**
+ * Возвращает все транзакции указанного типа.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @param {string} type - Тип транзакции, который нужно найти ("debit" или "credit").
+ * @returns {Array<Object>} Массив транзакций указанного типа.
+ */
+function getTransactionByType(transactions, type) {
+    return transactions.filter(function (transaction) {
+        return transaction.transaction_type === type;
+    });
+}
+
+/**
+ * Возвращает транзакции, дата которых находится в указанном диапазоне.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @param {string} startDate - Начальная дата диапазона в формате YYYY-MM-DD.
+ * @param {string} endDate - Конечная дата диапазона в формате YYYY-MM-DD.
+ * @returns {Array<Object>} Массив транзакций в заданном диапазоне дат.
+ */
+function getTransactionsInDateRange(transactions, startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    return transactions.filter(function (transaction) {
+        const currentDate = new Date(transaction.transaction_date);
+        return currentDate >= start && currentDate <= end;
+    });
+}
+
+/**
+ * Возвращает транзакции, выполненные у указанного продавца или сервиса.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @param {string} merchantName - Название магазина или сервиса.
+ * @returns {Array<Object>} Массив транзакций данного магазина или сервиса.
+ */
+function getTransactionsByMerchant(transactions, merchantName) {
+    return transactions.filter(function (transaction) {
+        return transaction.merchant_name === merchantName;
+    });
+}
+
+/**
+ * Вычисляет среднее значение суммы транзакций.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @returns {number} Средняя сумма транзакций. Если массив пустой, возвращается 0.
+ */
+function calculateAverageTransactionAmount(transactions) {
+    if (transactions.length === 0) {
+        return 0;
+    }
+
+    const total = calculateTotalAmount(transactions);
+    return total / transactions.length;
+}
+
+/**
+ * Возвращает транзакции, сумма которых находится в заданном диапазоне.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @param {number} minAmount - Минимальная сумма диапазона.
+ * @param {number} maxAmount - Максимальная сумма диапазона.
+ * @returns {Array<Object>} Массив транзакций с суммой в указанном диапазоне.
+ */
+function getTransactionsByAmountRange(transactions, minAmount, maxAmount) {
+    return transactions.filter(function (transaction) {
+        return transaction.transaction_amount >= minAmount &&
+               transaction.transaction_amount <= maxAmount;
+    });
+}
+
+/**
+ * Вычисляет общую сумму всех дебетовых транзакций.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @returns {number} Общая сумма дебетовых транзакций.
+ */
+function calculateTotalDebitAmount(transactions) {
+    return transactions
+        .filter(function (transaction) {
+            return transaction.transaction_type === "debit";
+        })
+        .reduce(function (sum, transaction) {
+            return sum + transaction.transaction_amount;
+        }, 0);
+}
+
+/**
+ * Определяет месяц, в котором было больше всего транзакций.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @returns {string|null} Номер месяца, в котором было больше всего транзакций,
+ * или null, если массив пустой.
+ */
+function findMostTransactionsMonth(transactions) {
+    const monthsCount = {};
+
+    transactions.forEach(function (transaction) {
+        const date = new Date(transaction.transaction_date);
+        const month = date.getMonth() + 1;
+
+        if (!monthsCount[month]) {
+            monthsCount[month] = 0;
+        }
+
+        monthsCount[month]++;
+    });
+
+    let maxMonth = null;
+    let maxCount = 0;
+
+    for (let month in monthsCount) {
+        if (monthsCount[month] > maxCount) {
+            maxCount = monthsCount[month];
+            maxMonth = month;
         }
     }
 
-    return result;
+    return maxMonth;
 }
 
 /**
- * Общая сумма
+ * Определяет месяц, в котором было больше всего дебетовых транзакций.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @returns {string|null} Номер месяца, в котором было больше всего дебетовых транзакций,
+ * или null, если дебетовых транзакций нет.
  */
-function getTotalAmount(arr) {
-    let sum = 0;
+function findMostDebitTransactionMonth(transactions) {
+    const monthsCount = {};
 
-    for (let i = 0; i < arr.length; i++) {
-        sum += arr[i].transaction_amount;
-    }
+    transactions.forEach(function (transaction) {
+        if (transaction.transaction_type === "debit") {
+            const date = new Date(transaction.transaction_date);
+            const month = date.getMonth() + 1;
 
-    return sum;
-}
+            if (!monthsCount[month]) {
+                monthsCount[month] = 0;
+            }
 
-/**
- * Фильтр по типу
- */
-function getByType(arr, type) {
-    let result = [];
+            monthsCount[month]++;
+        }
+    });
 
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i].transaction_type === type) {
-            result.push(arr[i]);
+    let maxMonth = null;
+    let maxCount = 0;
+
+    for (let month in monthsCount) {
+        if (monthsCount[month] > maxCount) {
+            maxCount = monthsCount[month];
+            maxMonth = month;
         }
     }
 
-    return result;
+    return maxMonth;
 }
 
 /**
- * Фильтр по датам
+ * Определяет, каких транзакций больше: debit или credit.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @returns {string} Возвращает "debit", если дебетовых больше,
+ * "credit", если кредитовых больше,
+ * или "equal", если количество одинаковое.
  */
-function getByDateRange(arr, start, end) {
-    let result = [];
+function mostTransactionTypes(transactions) {
+    let debitCount = 0;
+    let creditCount = 0;
 
-    let s = new Date(start);
-    let e = new Date(end);
-
-    for (let i = 0; i < arr.length; i++) {
-        let d = new Date(arr[i].transaction_date);
-        if (d >= s && d <= e) {
-            result.push(arr[i]);
+    transactions.forEach(function (transaction) {
+        if (transaction.transaction_type === "debit") {
+            debitCount++;
+        } else if (transaction.transaction_type === "credit") {
+            creditCount++;
         }
-    }
-    return result;
-}
+    });
 
-/**
- * Поиск по магазину
- */
-function getByMerchant(arr, name) {
-    let result = [];
-
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i].merchant_name === name) {
-            result.push(arr[i]);
-        }
-    }
-
-    return result;
-}
-
-/**
- * Среднее значение
- */
-function getAverage(arr) {
-    if (arr.length === 0) return 0;
-
-    return getTotalAmount(arr) / arr.length;
-}
-
-/**
- * Фильтр по сумме
- */
-function getByAmount(arr, min, max) {
-    let result = [];
-
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i].transaction_amount >= min && arr[i].transaction_amount <= max) {
-            result.push(arr[i]);
-        }
-    }
-
-    return result;
-}
-
-/**
- * Сумма debit
- */
-function getDebitSum(arr) {
-    let sum = 0;
-
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i].transaction_type === "debit") {
-            sum += arr[i].transaction_amount;
-        }
-    }
-
-    return sum;
-}
-
-/**
- * Месяц максимум
- */
-function getMaxMonth(arr) {
-    let months = {};
-
-    for (let i = 0; i < arr.length; i++) {
-        let m = new Date(arr[i].transaction_date).getMonth() + 1;
-        if (!months[m]) months[m] = 0;
-        months[m]++;
-    }
-
-    let max = 0;
-    let res = null;
-
-    for (let key in months) {
-        if (months[key] > max) {
-            max = months[key];
-            res = key;
-        }
-    }
-    return res;
-}
-
-/**
- * Месяц максимум debit
- */
-function getMaxDebitMonth(arr) {
-    let months = {};
-
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i].transaction_type === "debit") {
-            let m = new Date(arr[i].transaction_date).getMonth() + 1;
-            if (!months[m]) months[m] = 0;
-            months[m]++;
-        }
-    }
-
-    let max = 0;
-    let res = null;
-
-    for (let key in months) {
-        if (months[key] > max) {
-            max = months[key];
-            res = key;
-        }
-    }
-
-    return res;
-}
-
-/**
- * Сравнение типов
- */
-function compareTypes(arr) {
-    let d = 0, c = 0;
-
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i].transaction_type === "debit") d++;
-        else if (arr[i].transaction_type === "credit") c++;
-    }
-
-    if (d > c) return "debit";
-    if (c > d) return "credit";
-
-    return "equal";
-}
-
-/**
- * До даты
- */
-function beforeDate(arr, date) {
-    let result = [];
-    let d = new Date(date);
-
-    for (let i = 0; i < arr.length; i++) {
-        if (new Date(arr[i].transaction_date) < d) {
-            result.push(arr[i]);
-        }
-    }
-
-    return result;
-}
-
-/**
- * Поиск по id
- */
-function getById(arr, id) {
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i].transaction_id === id) {
-            return arr[i];
-        }
+    if (debitCount > creditCount) {
+        return "debit";
+    } else if (creditCount > debitCount) {
+        return "credit";
+    } else {
+        return "equal";
     }
 }
 
 /**
- * Описания
+ * Возвращает транзакции, совершенные до указанной даты.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @param {string} date - Дата в формате YYYY-MM-DD.
+ * @returns {Array<Object>} Массив транзакций, совершенных до указанной даты.
  */
-function getDescriptions(arr) {
-    let result = [];
+function getTransactionsBeforeDate(transactions, date) {
+    const targetDate = new Date(date);
 
-    for (let i = 0; i < arr.length; i++) {
-        result.push(arr[i].transaction_description);
-    }
-
-    return result;
+    return transactions.filter(function (transaction) {
+        return new Date(transaction.transaction_date) < targetDate;
+    });
 }
 
+/**
+ * Ищет транзакцию по ее уникальному идентификатору.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @param {number} id - Идентификатор транзакции.
+ * @returns {Object|undefined} Найденная транзакция или undefined, если транзакция не найдена.
+ */
+function findTransactionById(transactions, id) {
+    return transactions.find(function (transaction) {
+        return transaction.transaction_id === id;
+    });
+}
+
+/**
+ * Создает новый массив, содержащий только описания транзакций.
+ *
+ * @param {Array<Object>} transactions - Массив транзакций.
+ * @returns {Array<string>} Массив описаний транзакций.
+ */
+function mapTransactionDescriptions(transactions) {
+    return transactions.map(function (transaction) {
+        return transaction.transaction_description;
+    });
+}
 
 // вывод
 
