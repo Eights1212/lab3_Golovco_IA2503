@@ -299,17 +299,17 @@ function mapTransactionDescriptions(transactions) {
 
 // вывод
 
-console.log(getUniqueTypes(transactions));
-console.log(getTotalAmount(transactions));
-console.log(getByType(transactions, "debit"));
-console.log(getByDateRange(transactions, "2021-06-01", "2021-06-20"));
-console.log(getByMerchant(transactions, "ShoeStore"));
-console.log(getAverage(transactions));
-console.log(getByAmount(transactions, 50, 200));
-console.log(getDebitSum(transactions));
-console.log(getMaxMonth(transactions));
-console.log(getMaxDebitMonth(transactions));
-console.log(compareTypes(transactions));
-console.log(beforeDate(transactions, "2021-06-12"));
-console.log(getById(transactions, 31));
-console.log(getDescriptions(transactions));
+console.log(getUniqueTransactionTypes(transactions));
+console.log(calculateTotalAmount(transactions));
+console.log(getTransactionByType(transactions, "debit"));
+console.log(getTransactionInDateRange(transactions, "2021-06-01", "2021-06-20"));
+console.log(getTransactionByMerchant(transactions, "ShoeStore"));
+console.log(calculateAverageTransactionAmount(transactions));
+console.log(getTransactionsByAmountRange(transactions, 50, 200));
+console.log(calculateTotalDebitAmount(transactions));
+console.log(findMostTransactionsMonth(transactions));
+console.log(findMostDebitTransactionMonth(transactions));
+console.log(mostTransactionTypes(transactions));
+console.log(getTransactionsBeforeDate(transactions, "2021-06-12"));
+console.log(findTransactionsById(transactions, 31));
+console.log(mapTransactionDescriptions(transactions));
